@@ -3,7 +3,7 @@
 #include <assert.h>
 
 // Here you can set the device ID that was assigned to you
-#define MYDEVICE 0
+#define MYDEVICE 7
 
 // Simple utility function to check for CUDA runtime errors
 void checkCUDAError(const char *msg);
@@ -16,6 +16,7 @@ int main()
     cudaSetDevice(MYDEVICE);
     // pointer and dimension for host memory
     int dimA = 8;
+    //    int dimA = 80000000;
     float *h_a;
 
     // pointers for device memory
@@ -24,6 +25,8 @@ int main()
     // allocate and initialize host memory
     // Bonus: try using cudaMallocHost in place of malloc
     // it has the same syntax as cudaMalloc, but it enables asynchronous copies
+
+    //cudaMallocHost(&h_a,dimA*sizeof(float));
     h_a = (float *) malloc(dimA*sizeof(float));
     for (int i = 0; i<dimA; ++i)
     {
@@ -32,14 +35,16 @@ int main()
 
     // Part 1 of 5: allocate device memory
     size_t memSize = dimA*sizeof(float);
-    cudaMalloc(  );
-    cudaMalloc(  );
+    //cudaMalloc(&d_a, memSize);
+    //cudaMalloc(&d_b, memSize);
+    cudaMalloc(&d_a, memSize);
+    cudaMalloc(&d_b, memSize);
 
     // Part 2 of 5: host to device memory copy
-    cudaMemcpy(  );
+    cudaMemcpy(d_a, h_a, memSize, cudaMemcpyHostToDevice);
 
     // Part 3 of 5: device to device memory copy
-    cudaMemcpy(  );
+    cudaMemcpy(d_b, d_a, memSize, cudaMemcpyDeviceToDevice);
 
     // clear host memory
     for (int i=0; i<dimA; ++i )
@@ -48,7 +53,7 @@ int main()
     }
 
     // Part 4 of 5: device to host copy
-    cudaMemcpy(  );
+    cudaMemcpy(h_a, d_b, memSize, cudaMemcpyDeviceToHost);
 
     // Check for any CUDA errors
     checkCUDAError("cudaMemcpy calls");
@@ -60,8 +65,8 @@ int main()
     }
 
     // Part 5 of 5: free device memory pointers d_a and d_b
-    cudaFree( );
-    cudaFree( );
+    cudaFree( d_a);
+    cudaFree( d_b);
 
     // Check for any CUDA errors
     checkCUDAError("cudaFree");
